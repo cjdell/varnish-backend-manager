@@ -1,10 +1,7 @@
 Introduction
 ============
 
-Varnish Backend Manager is a single binary utility designed to generate a VCL
-fragment for inclusion into a Varnish configuration file (i.e. default.vcl).
-The tool allows the user match host headers `req.http.host` with the backend
-intended to serve them, effectively turning Varnish into a HTTP switch.vcl:
+Varnish Backend Manager is a single binary utility designed to generate a VCL fragment for inclusion into a Varnish configuration file (i.e. default.vcl). The tool allows the user match host headers `req.http.host` with the backend intended to serve them, effectively turning Varnish into a HTTP switch:
 
 ![Admin screen](screenshot.png)
 
@@ -49,8 +46,7 @@ i.e.:
 
 	./varnish-backend-manager localhost:8083 s3cr3t
 	
-Use `localhost:[port]` for internal access only, or via SSH tunnel. For public 
-access, an external IP may be used.
+Use `localhost:[port]` for internal access only, or via SSH tunnel. For public access, an external IP may be used.
 	
 Build for other platforms
 =========================
@@ -78,12 +74,16 @@ Build the binary:
 Applying configuration
 ======================
 
-Symlink the VCL file "output/switch.vcl" to a link within your varnish configuration folder.
+Symlink the VCL file "output/switch.vcl" to a link within your varnish configuration folder:
 
-Then import the file into your varnish configuration (i.e. default.acl) with:
+	ln -s /path/to/varnish-backend-manager/output/switch.vcl /etc/varnish/switch.vcl
+
+Then import the file into your varnish configuration (i.e. /etc/varnish/default.acl) with:
 
 	sub vcl_recv {
 		...
 		include "switch.vcl";
 		...
 	}
+
+The backend names refer to Varnish backends defined within your Varnish configuration. Initially Varnish will only have the `default` backend. You need to define valid backends for each of the servers you intend to route traffic to.  

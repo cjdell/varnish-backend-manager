@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>Varnish Backend Manager</title>
+	
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	
+	<script type="text/javascript">
+		var app = angular.module('varnish-backend-manager', []);
+		
+		app.controller('EntryCtrl', function($scope, $http) {
+			$scope.entries = [];
+			
+			load();
+			
+			function load() {
+				return $http.get('/api/entries')
+				.then(function(result) {
+					$scope.entries = result.data;
+				})
+				.catch(function(err) {
+				 	console.error(err);
+				});
+			}
+			
+			function add() {
+				$scope.entries.push({});
+			}
+			
+			function save(entry) {
+				return $http.post('/api/entries', entry)
+				.then(function(result) {
+					return load();
+				})
+				.catch(function(err) {
+				 	console.error(err);
+				});
+			}
+			
+			function del(entry) {
+				return $http.delete('/api/entries/' + entry.Host)
+				.then(function(result) {
+					return load();
+				})
+				.catch(function(err) {
+				 	console.error(err);
+				});
+			}
+			
+			function apply() {
+				return $http.post('/api/apply')
+				.then(function(result) {
+					alert('Configuration successfully applied');
+				})
+				.catch(function(err) {
+					alert(err.data);
+				 	console.error(err);
+				});
+			}
+			
+			$scope.add = add;
+			$scope.save = save;
+			$scope.del = del;
+			$scope.apply = apply;
+			
+			$scope.entryChanged = function(entry) {
+				entry.__changed = true;
+			};
+		});
+	</script>
+</head>
+<body>
+	<div class="container" ng-app="varnish-backend-manager">
+      	<div class="header clearfix">
+			<h1>Varnish Backend Manager</h1>
+		</div>
+
+		<div class="entries" ng-controller="EntryCtrl">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Host</th>
+						<th>Backend</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="entry in entries">
+						<td>
+							<input type="text" class="form-control" ng-model="entry.Host" ng-change="entryChanged(entry)" />
+						</td>
+						<td>
+							<input type="text" class="form-control" ng-model="entry.Backend" ng-change="entryChanged(entry)" />
+						</td>
+						<td>
+							<button class="btn btn-danger" ng-click="del(entry)">Delete</button>
+							<button class="btn btn-primary" ng-click="save(entry)" ng-show="entry.__changed">Save</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div class="btn-toolbar">
+				<button class="btn btn-success" ng-click="add()">Add New</button>
+				<button class="btn btn-primary" ng-click="apply()">Apply</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

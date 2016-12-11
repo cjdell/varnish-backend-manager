@@ -1,0 +1,12 @@
+[Unit]
+Description=Varnish Backend Manager
+
+[Service]
+ExecStart=/opt/varnish-backend-manager/start.sh
+Restart=always
+User=root
+Group=root
+WorkingDirectory=/opt/varnish-backend-manager
+
+[Install]
+WantedBy=multi-user.target

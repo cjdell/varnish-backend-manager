@@ -87,3 +87,12 @@ Then import the file into your varnish configuration (i.e. /etc/varnish/default.
 	}
 
 The backend names refer to Varnish backends defined within your Varnish configuration. Initially Varnish will only have the `default` backend. You need to define valid backends for each of the servers you intend to route traffic to.  
+
+Installation as permanent service
+=================================
+
+After build is complete, run:
+
+	./install.sh
+	
+This will copy the binary to `/opt/varnish-backend-manager` and create a systemd unit file. Please edit the file `/opt/varnish-backend-manager/start.sh` with your choice of IP address, port and login password.
